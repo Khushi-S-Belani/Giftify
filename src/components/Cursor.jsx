@@ -5,7 +5,8 @@ const Cursor = () => {
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
   
-  const springConfig = { damping: 25, stiffness: 700 }
+  // Critical damping to avoid overshoot/springing
+  const springConfig = { damping: 50, stiffness: 1000, mass: 0.5 }
   const cursorXSpring = useSpring(cursorX, springConfig)
   const cursorYSpring = useSpring(cursorY, springConfig)
   

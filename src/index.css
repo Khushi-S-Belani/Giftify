@@ -15,24 +15,27 @@
 }
 
 /* Nav */
+/* Nav */
 .glass-nav {
     position: fixed;
     top: 20px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0); /* Hardware accelerate */
     width: 90%;
     max-width: 1200px;
     height: 60px;
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
     border: 1px solid var(--c-border);
     border-radius: 99px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem;
-    z-index: 100;
+    z-index: 9999; /* Ensure it stays on top */
     box-shadow: var(--shadow-sm);
+    will-change: transform;
 }
 
 .logo {

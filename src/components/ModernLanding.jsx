@@ -1,6 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Cursor from './Cursor'
+import Flow3D from './Flow3D'
 
 const AnimationSection = ({ children, className }) => {
   return (
@@ -207,6 +208,22 @@ const ModernLanding = () => {
                 </div>
             </div>
          </AnimationSection>
+      </section>
+
+      {/* How It Works Flow */}
+      <section className="flow-section">
+        <AnimationSection className="text-center">
+            <h2 className="section-title">The Secure Gift Flow</h2>
+            <p className="section-desc">See how we protect your information every step of the way.</p>
+        </AnimationSection>
+        
+        <AnimationSection className="interactive">
+            <div style={{ maxWidth: '1000px', margin: '0 auto', boxShadow: 'var(--shadow-lg)', borderRadius: '24px' }}>
+                <Flow3D />
+            </div>
+        </AnimationSection>
+
+        {/* Timeline removed to reduce clutter - 3D scene explains it all */}
       </section>
 
       {/* Premium Footer */}
