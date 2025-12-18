@@ -25,8 +25,13 @@ const Register = () => {
             const { doc, setDoc } = await import('firebase/firestore');
             const { auth, db } = await import('../firebase');
 
-            // 1. Create User in Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+            // 1. Create User in Auth with Timeout
+            const createPromise = createUserWithEmailAndPassword(auth, data.email, data.password);
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Request timed out - Please check your network or adblocker")), 10000)
+            );
+
+            const userCredential = await Promise.race([createPromise, timeoutPromise]);
             const user = userCredential.user;
 
             // 2. Update Display Name
@@ -52,7 +57,7 @@ const Register = () => {
             console.error("Registration Error:", err);
             
             let msg = 'Registration failed.';
-            if (err.message && err.message.includes("Failed to fetch")) {
+            if (err.message && (err.message.includes("Failed to fetch") || err.message.includes("timed out"))) {
                 msg = "Network Error: Please disable AdBlockers or strict privacy protections.";
             } else if (err.code === 'auth/email-already-in-use') {
                 msg = 'Email already in use.';
