@@ -28,34 +28,62 @@ const Login = () => {
             const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
             const user = userCredential.user;
 
-            // 2. Fetch User Role from Firestore
+            // 2. Fetch User Role from Firestore with Timeout
             const docRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(docRef);
+            
+            // Create a race between fetch and timeout
+            const fetchPromise = getDoc(docRef);
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Request timed out - Please check your network or adblocker")), 10000)
+            );
 
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
+            try {
+                const docSnap = await Promise.race([fetchPromise, timeoutPromise]);
                 
-                // Save complete user info locally for dashboards
-                localStorage.setItem('user', JSON.stringify({ 
-                    uid: user.uid,
-                    ...userData 
-                }));
-
-                addToast(`Welcome back, ${userData.firstName}!`, 'success');
-
-                // Redirect based on role
-                if (userData.role === 'creator') {
-                    setLocation('/dashboard/creator');
-                } else {
-                    setLocation('/dashboard/fan');
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    localStorage.setItem('user', JSON.stringify({ uid: user.uid, ...userData }));
+                    addToast(`Welcome back, ${userData.firstName}!`, 'success');
+                    
+                    if (userData.role === 'creator') setLocation('/dashboard/creator');
+                    else setLocation('/dashboard/fan');
+                    return;
                 }
-            } else {
-                addToast("User profile not found. Please contact support.", 'error');
-                setLoading(false);
+            } catch (timeoutErr) {
+                // If auth worked but DB timed out, fallback to limited mode
+                console.warn("Firestore timed out, falling back to limited mode");
+                
+                const limitedUser = {
+                    uid: user.uid,
+                    email: user.email,
+                    firstName: 'User',
+                    lastName: '',
+                    role: 'fan', // Default fallback
+                    isLimitedMode: true
+                };
+                
+                localStorage.setItem('user', JSON.stringify(limitedUser));
+                addToast("Network restrictions detected. Entering Limited Mode.", 'info');
+                setLocation('/dashboard/fan');
+                return;
             }
 
+            throw new Error("Profile not found in database.");
+
         } catch (err) {
-            addToast(err.code === 'auth/invalid-credential' ? 'Invalid email or password.' : `Login failed: ${err.message}`, 'error');
+            console.error("Login Error Details:", err);
+            
+            let message = `Login failed: ${err.message}`;
+            
+            if (err.message && (err.message.includes("Failed to fetch") || err.message.includes("timed out"))) {
+                message = "Network Error: Please disable McAfee WebAdvisor or other Antivirus extensions for this site.";
+            } else if (err.code === 'auth/invalid-credential') {
+                message = "Invalid email or password.";
+            } else if (err.code === 'unavailable') {
+                message = "Service unavailable. Check your internet connection.";
+            }
+
+            addToast(message, 'error');
             setLoading(false);
         }
     }

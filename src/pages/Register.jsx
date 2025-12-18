@@ -25,33 +25,59 @@ const Register = () => {
             const { doc, setDoc } = await import('firebase/firestore');
             const { auth, db } = await import('../firebase');
 
-            // 1. Create User in Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-            const user = userCredential.user;
+            // 1. Create User in Auth with Timeout
+            const createPromise = createUserWithEmailAndPassword(auth, data.email, data.password);
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Request timed out - Please check your network or adblocker")), 10000)
+            );
 
-            // 2. Update Display Name
-            await updateProfile(user, {
-                displayName: `${data.firstName} ${data.lastName}`
-            });
+            try {
+                const userCredential = await Promise.race([createPromise, timeoutPromise]);
+                const user = userCredential.user;
 
-            // 3. Store Role & Details in Firestore
-            const userData = {
-                firstName: data.firstName,
-                lastName: data.lastName,
-                email: data.email,
-                role: data.role,
-                createdAt: new Date().toISOString()
-            };
+                // 2. Update Display Name (Auth Layer - usually works)
+                await updateProfile(user, {
+                    displayName: `${data.firstName} ${data.lastName}`
+                });
 
-            await setDoc(doc(db, "users", user.uid), userData);
+                // 3. Store Role & Details in Firestore (Might Fail)
+                const userData = {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    email: data.email,
+                    role: data.role,
+                    createdAt: new Date().toISOString()
+                };
 
-            addToast('Account created successfully! Please sign in.', 'success');
-            setLocation('/login');
+                await setDoc(doc(db, "users", user.uid), userData);
+
+                addToast('Account created successfully! Please sign in.', 'success');
+                setLocation('/login');
+            } catch (err) {
+                 if (err.message && err.message.includes("timed out")) {
+                    // Timeout hit - but User might be created in Auth
+                    console.warn("Firestore timed out during register");
+                    addToast("Account created, but database connection timed out. Please try logging in.", 'warning');
+                    setLocation('/login');
+                    return;
+                }
+                throw err;
+            }
 
         } catch (err) {
+            console.error("Registration Error:", err);
+            
             let msg = 'Registration failed.';
-            if (err.code === 'auth/email-already-in-use') msg = 'Email already in use.';
-            if (err.code === 'auth/weak-password') msg = 'Password should be at least 6 characters.';
+            if (err.message && (err.message.includes("Failed to fetch") || err.message.includes("timed out"))) {
+                msg = "Network Error: Please disable McAfee WebAdvisor or other Antivirus extensions for this site.";
+            } else if (err.code === 'auth/email-already-in-use') {
+                msg = 'Email already in use.';
+            } else if (err.code === 'auth/weak-password') {
+                msg = 'Password should be at least 6 characters.';
+            } else if (err.code === 'unavailable') {
+                msg = 'Service timeout. Check your network or AdBlocker.';
+            }
+
             addToast(msg, 'error');
             setLoading(false);
         }

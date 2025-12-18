@@ -23,5 +23,11 @@ console.log('Firebase Config loaded:', firebaseConfig.projectId);
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// Use initializeFirestore to allow for custom settings
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+
+export const db = initializeFirestore(app, {
+    experimentalForceLongPolling: true,
+});
 export default app;

@@ -60,9 +60,9 @@ const AdminDashboard = () => {
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
                 <div style={{ marginBottom: '2rem' }}>
                     <Link href="/">
-                        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: 'none', background: 'transparent', cursor: 'pointer', color: '#94A3B8', fontWeight: 600 }}>
+                        <a style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: 'none', background: 'transparent', cursor: 'pointer', color: '#94A3B8', fontWeight: 600, textDecoration: 'none' }}>
                             <ArrowLeft size={18} /> Back Home
-                        </button>
+                        </a>
                     </Link>
                 </div>
 

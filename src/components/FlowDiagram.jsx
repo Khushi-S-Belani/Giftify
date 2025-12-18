@@ -10,16 +10,17 @@ const FlowDiagram = () => {
                 <line x1="0" y1="0" x2="100%" y2="0" stroke="#E2E8F0" strokeWidth="2" strokeDasharray="10 10" />
 
                 {/* Moving Packet Animation */}
-                <motion.circle
-                    cx="0" cy="0" r="12" fill="rgba(59, 130, 246, 0.3)"
-                    animate={{ cx: ["0%", "50%", "100%"] }}
+                {/* Moving Packet Animation */}
+                <motion.g
+                    initial={{ x: "0%" }}
+                    animate={{ x: ["0%", "100%"] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.circle
-                    cx="0" cy="0" r="6" fill="#3B82F6"
-                    animate={{ cx: ["0%", "50%", "100%"] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                />
+                >
+                    {/* Glow effect */}
+                    <circle cx="0" cy="0" r="12" fill="rgba(59, 130, 246, 0.3)" />
+                    {/* Main Dot */}
+                    <circle cx="0" cy="0" r="6" fill="#3B82F6" />
+                </motion.g>
             </svg>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', position: 'relative', zIndex: 1 }}>
