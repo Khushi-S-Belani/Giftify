@@ -13,7 +13,12 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-console.log('Firebase Config:', firebaseConfig); // Debugging
+if (!firebaseConfig.apiKey) {
+    console.error("Firebase Config is missing! Check .env file.");
+    alert("Critical Error: Firebase configuration not found. Please check .env file.");
+}
+
+console.log('Firebase Config loaded:', firebaseConfig.projectId);
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);

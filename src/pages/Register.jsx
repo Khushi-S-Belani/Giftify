@@ -1,15 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useLocation } from 'wouter'
 import '../index.css'
 import '../refined_theme.css'
 
+import { useToast } from '../components/ToastContext'
+
 const Register = () => {
     const [, setLocation] = useLocation();
+    const { addToast } = useToast();
+    const [loading, setLoading] = useState(false);
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        
+        if (loading) return;
+
+        setLoading(true);
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
 
@@ -39,16 +45,15 @@ const Register = () => {
 
             await setDoc(doc(db, "users", user.uid), userData);
 
-            console.log('Registration success:', user);
-            alert('Account created successfully! Please sign in.');
+            addToast('Account created successfully! Please sign in.', 'success');
             setLocation('/login');
 
         } catch (err) {
-            console.error('Registration error:', err);
             let msg = 'Registration failed.';
             if (err.code === 'auth/email-already-in-use') msg = 'Email already in use.';
             if (err.code === 'auth/weak-password') msg = 'Password should be at least 6 characters.';
-            alert(msg);
+            addToast(msg, 'error');
+            setLoading(false);
         }
     }
 
@@ -124,22 +129,34 @@ const Register = () => {
                         </div>
 
                         <button
+                            disabled={loading}
                             className="btn-primary interactive"
                             style={{
-                                background: 'var(--grad-primary)',
+                                background: loading ? '#94A3B8' : 'var(--grad-primary)',
                                 border: 'none',
                                 padding: '12px',
                                 marginTop: '0.5rem',
                                 width: '100%',
-                                fontWeight: 600
+                                fontWeight: 600,
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                gap: '8px'
                             }}
                         >
-                            Create Account
+                            {loading ? (
+                                <>
+                                    <div className="spinner"></div> Creating Account...
+                                </>
+                            ) : (
+                                'Create Account'
+                            )}
                         </button>
                     </form>
 
                     <div style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--c-text-muted)' }}>
-                        Already have an account? <Link href="/login"><a href="#" style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 600 }}>Sign In</a></Link>
+                        Already have an account? <Link href="/login" style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 600 }}>Sign In</Link>
                     </div>
                 </motion.div>
             </div>

@@ -1,14 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useLocation } from 'wouter'
 import '../index.css'
 import '../refined_theme.css'
 
+import { useToast } from '../components/ToastContext'
+
 const Login = () => {
     const [, setLocation] = useLocation();
+    const { addToast } = useToast();
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        if (loading) return;
+
+        setLoading(true);
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
 
@@ -27,13 +34,14 @@ const Login = () => {
 
             if (docSnap.exists()) {
                 const userData = docSnap.data();
-                console.log('Login success:', userData);
                 
                 // Save complete user info locally for dashboards
                 localStorage.setItem('user', JSON.stringify({ 
                     uid: user.uid,
                     ...userData 
                 }));
+
+                addToast(`Welcome back, ${userData.firstName}!`, 'success');
 
                 // Redirect based on role
                 if (userData.role === 'creator') {
@@ -42,13 +50,13 @@ const Login = () => {
                     setLocation('/dashboard/fan');
                 }
             } else {
-                console.error("No such user document!");
-                alert("User profile not found. Please contact support.");
+                addToast("User profile not found. Please contact support.", 'error');
+                setLoading(false);
             }
 
         } catch (err) {
-            console.error('Login error:', err);
-            alert('Invalid email or password.');
+            addToast(err.code === 'auth/invalid-credential' ? 'Invalid email or password.' : `Login failed: ${err.message}`, 'error');
+            setLoading(false);
         }
     }
 
@@ -103,22 +111,34 @@ const Login = () => {
                         </div>
 
                         <button
+                            disabled={loading}
                             className="btn-primary interactive"
                             style={{
-                                background: 'var(--grad-primary)',
+                                background: loading ? '#94A3B8' : 'var(--grad-primary)',
                                 border: 'none',
                                 padding: '12px',
                                 marginTop: '0.5rem',
                                 width: '100%',
-                                fontWeight: 600
+                                fontWeight: 600,
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                gap: '8px'
                             }}
                         >
-                            Sign In
+                            {loading ? (
+                                <>
+                                    <div className="spinner"></div> Signing In...
+                                </>
+                            ) : (
+                                'Sign In'
+                            )}
                         </button>
                     </form>
 
                     <div style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--c-text-muted)' }}>
-                        Don't have an account? <Link href="/register"><a href="#" style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 600 }}>Sign Up</a></Link>
+                        Don't have an account? <Link href="/register" style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 600 }}>Sign Up</Link>
                     </div>
                 </motion.div>
             </div>

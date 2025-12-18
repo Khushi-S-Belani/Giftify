@@ -6,22 +6,25 @@ import Register from './pages/Register'
 import FanDashboard from './pages/FanDashboard'
 import CreatorDashboard from './pages/CreatorDashboard'
 import AdminDashboard from './pages/AdminDashboard'
+import { ToastProvider } from './components/ToastContext'
 import './index.css'
 import './refined_theme.css'
 
 function App() {
   return (
-    <Switch>
-      <Route path="/" component={ModernLanding} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route path="/dashboard/fan" component={FanDashboard} />
-      <Route path="/dashboard/creator" component={CreatorDashboard} />
-      <Route path="/dashboard/fan/:subpage" component={FanDashboard} />
-      <Route path="/dashboard/creator/:subpage" component={CreatorDashboard} />
-      <Route>404: No such page!</Route>
-    </Switch>
+    <ToastProvider>
+      <Switch>
+        <Route path="/" component={ModernLanding} />
+        <Route path="/admin" component={AdminDashboard} />
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/dashboard/fan" component={FanDashboard} />
+        <Route path="/dashboard/creator" component={CreatorDashboard} />
+        <Route path="/dashboard/fan/:subpage" component={FanDashboard} />
+        <Route path="/dashboard/creator/:subpage" component={CreatorDashboard} />
+        <Route>404: No such page!</Route>
+      </Switch>
+    </ToastProvider>
   )
 }
 

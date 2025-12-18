@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'wouter'
 import { motion } from 'framer-motion'
 import { Link as LinkIcon, Shield, ArrowLeft, RefreshCw } from 'lucide-react'
+import { useToast } from '../components/ToastContext'
 import '../index.css'
 import '../refined_theme.css'
 
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { addToast } = useToast();
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -24,7 +26,7 @@ const AdminDashboard = () => {
             setUsers(usersList);
             setLoading(false);
         } catch (err) {
-            console.error("Failed to fetch users", err);
+            addToast("Failed to fetch users", 'error');
             setLoading(false);
         }
     };
@@ -44,9 +46,9 @@ const AdminDashboard = () => {
             await updateDoc(userRef, { role: newRole });
             
             fetchUsers(); // Refresh list
+            addToast(`Role updated to ${newRole}`, 'success');
         } catch (error) {
-            console.error('Error updating role:', error);
-            alert('Error updating role');
+            addToast('Error updating role', 'error');
         }
     };
 
