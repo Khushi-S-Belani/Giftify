@@ -58,7 +58,7 @@ const Register = () => {
             
             let msg = 'Registration failed.';
             if (err.message && (err.message.includes("Failed to fetch") || err.message.includes("timed out"))) {
-                msg = "Network Error: Please disable AdBlockers or strict privacy protections.";
+                msg = "Network Error: Please disable McAfee WebAdvisor or other Antivirus extensions for this site.";
             } else if (err.code === 'auth/email-already-in-use') {
                 msg = 'Email already in use.';
             } else if (err.code === 'auth/weak-password') {

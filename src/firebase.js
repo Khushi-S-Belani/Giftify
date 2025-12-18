@@ -28,6 +28,6 @@ export const auth = getAuth(app);
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 
 export const db = initializeFirestore(app, {
-    localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+    experimentalForceLongPolling: true,
 });
 export default app;
