@@ -11,13 +11,15 @@ const FlowDiagram = () => {
 
                 {/* Moving Packet Animation */}
                 <motion.circle
+                    cx="0" cy="0" r="12" fill="rgba(59, 130, 246, 0.3)"
+                    animate={{ cx: ["0%", "50%", "100%"] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.circle
                     cx="0" cy="0" r="6" fill="#3B82F6"
                     animate={{ cx: ["0%", "50%", "100%"] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                >
-                    {/* Glow effect */}
-                    <circle r="12" fill="rgba(59, 130, 246, 0.3)" />
-                </motion.circle>
+                />
             </svg>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', position: 'relative', zIndex: 1 }}>

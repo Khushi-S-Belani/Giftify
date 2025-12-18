@@ -65,7 +65,7 @@ const LocationNode = ({ position, icon, label, subLabel }) => {
                 <sphereGeometry args={[0.2, 16, 16]} />
                 <meshStandardMaterial color="#94A3B8" />
             </mesh>
-            <Html position={[0, 1, 0]} center>
+            <Html position={[0, 1, 0]} center zIndexRange={[50, 0]}>
                 <div style={{ textAlign: 'center', pointerEvents: 'none' }}>
                     <div style={{ fontSize: '24px', marginBottom: '5px' }}>{icon}</div>
                     <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#1E293B' }}>{label}</div>
@@ -109,7 +109,7 @@ const Scene = () => {
             />
 
             {/* Secure Tag Floating Above Hub */}
-            <Html position={[0, 0.5, 0]} center>
+            <Html position={[0, 0.5, 0]} center zIndexRange={[50, 0]}>
                 <div style={{
                     background: 'white',
                     padding: '6px 12px',
@@ -146,7 +146,7 @@ const Scene = () => {
                 onClick={() => setStep((s) => (s + 1) % 2)}
             />
 
-            <Html position={[0, 2, 0]} center>
+            <Html position={[0, 2, 0]} center zIndexRange={[50, 0]}>
                 <div style={{ textAlign: 'center', width: '200px' }}>
                     <div style={{ background: '#EFF6FF', padding: '10px', borderRadius: '12px', border: '1px solid #3B82F6' }}>
                         <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#3B82F6', fontWeight: 'bold' }}>Creator View</div>
