@@ -35,14 +35,8 @@ const AdminDashboard = () => {
             setUsers(usersList);
             setLoading(false);
         } catch (err) {
-            console.warn("Using Demo Data due to:", err.message);
-            // Fallback to Demo Data so the Admin UI is usable/visible
-            setUsers([
-                { id: 'demo_fan_1', firstName: 'Sarah', lastName: 'Fan', email: 'sarah@example.com', role: 'fan' },
-                { id: 'demo_creator_1', firstName: 'Alex', lastName: 'Creator', email: 'alex@example.com', role: 'creator' },
-                { id: 'demo_user_3', firstName: 'Prince', lastName: 'User', email: 'prince@giftify.com', role: 'creator' }
-            ]);
-            addToast("Network blocked or empty DB: Showing Demo Data", 'info');
+            console.error("Fetch error:", err);
+            addToast("Could not load users. Please check your network.", 'error');
             setLoading(false);
         }
     };

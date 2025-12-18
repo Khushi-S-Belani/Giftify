@@ -52,9 +52,9 @@ const Register = () => {
                 // 3. Store Role & Details in Firestore (Might Fail - with timeout)
                 const firestorePromise = setDoc(doc(db, "users", user.uid), userData);
                 
-                // Reuse timeout logic for Firestore write
+                // Reuse timeout logic for Firestore write (5 seconds to ensure data saves)
                 const writeTimeout = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error("Firestore write timed out")), 2000)
+                    setTimeout(() => reject(new Error("Firestore write timed out")), 5000)
                 );
 
                 await Promise.race([firestorePromise, writeTimeout]);
